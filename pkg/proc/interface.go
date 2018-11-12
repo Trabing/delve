@@ -68,6 +68,7 @@ type Info interface {
 	// ErrProcessExited or ProcessDetachedError).
 	Valid() (bool, error)
 	BinInfo() *BinaryInfo
+	EntryPoint() (uint64, error)
 	// Common returns a struct with fields common to all backends
 	Common() *CommonProcess
 
@@ -86,10 +87,12 @@ type ThreadInfo interface {
 // GoroutineInfo is an interface for getting information on running goroutines.
 type GoroutineInfo interface {
 	SelectedGoroutine() *G
+	SetSelectedGoroutine(*G)
 }
 
 // ProcessManipulation is an interface for changing the execution state of a process.
 type ProcessManipulation interface {
+	Initialize([]string) error
 	ContinueOnce() (trapthread Thread, err error)
 	StepInstruction() error
 	SwitchThread(int) error
@@ -105,6 +108,7 @@ type ProcessManipulation interface {
 type BreakpointManipulation interface {
 	Breakpoints() *BreakpointMap
 	SetBreakpoint(addr uint64, kind BreakpointKind, cond ast.Expr) (*Breakpoint, error)
+	WriteBreakpointFn() WriteBreakpointFn
 	ClearBreakpoint(addr uint64) (*Breakpoint, error)
 	ClearInternalBreakpoints() error
 }
@@ -112,6 +116,9 @@ type BreakpointManipulation interface {
 // CommonProcess contains fields used by this package, common to all
 // implementations of the Process interface.
 type CommonProcess struct {
+	// Path is the path on disk to the executable being debugged.
+	Path string
+
 	allGCache     []*G
 	fncallState   functionCallState
 	fncallEnabled bool

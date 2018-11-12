@@ -75,7 +75,7 @@ func (dbp *Process) detach(kill bool) error {
 	panic(ErrNativeBackendDisabled)
 }
 
-func (dbp *Process) entryPoint() (uint64, error) {
+func (dbp *Process) EntryPoint() (uint64, error) {
 	panic(ErrNativeBackendDisabled)
 }
 
@@ -126,3 +126,5 @@ func (t *Thread) restoreRegisters(sr proc.Registers) error {
 func (t *Thread) Stopped() bool {
 	panic(ErrNativeBackendDisabled)
 }
+
+func initialize(dbp *Process) error { return nil }
